@@ -5,8 +5,8 @@
   "main": "server/index.js",
   "compilerOptions": {},
   "scripts": {
-    "start": "ts-node server/server.ts",
-    "dev": "nodemon -x ts-node server/server.ts"
+    "start": "ts-node ./server/server.ts",
+    "dev": "nodemon -x ts-node ./server/server.ts"
   },
   "author": "",
   "license": "ISC",
