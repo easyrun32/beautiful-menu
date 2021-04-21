@@ -1,16 +1,28 @@
-import express from "express";
-import compression from "compression";
+import express, { Express } from "express";
+import * as http from "http";
+import * as socketio from "socket.io";
 import cors from "cors";
 import path from "path";
-const app = express();
-app.use(compression());
-app.use(cors());
+import { startSocket } from "./src/routes/socket";
 
 const PORT: string | number = process.env.PORT || 5000;
-app.get("/test", (req, res) => {
-  res.send({ typescript: "hello" });
+const CLIENT_HOST: string = "http://localhost:3000";
+
+const app: Express = express();
+
+// Set up http server and socket server
+const server: http.Server = http.createServer(app);
+export const io: socketio.Server = new socketio.Server(server, {
+  cors: {
+    origin: CLIENT_HOST,
+    credentials: true,
+  },
 });
-//client/build
+
+app.use(cors());
+
+startSocket(io);
+
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../client/build")));
 
@@ -19,8 +31,11 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-app.listen(PORT, () =>
-  console.log(
-    `Typescript Node server started at \n\nhttp://localhost:${PORT}/ `
-  )
-);
+app.set("port", PORT);
+
+// Start server
+server.listen(PORT, () => {
+  console.log(`listening on *:${PORT}`);
+});
+
+// export { io };
